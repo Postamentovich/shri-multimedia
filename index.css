@@ -1,0 +1,39 @@
+body {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.navbar {
+  height: 50px;
+  display: flex;
+  justify-content: space-around;
+  background-color: aqua;
+  align-items: center;
+}
+
+.button {
+  height: 30px;
+  width: 100%;
+  background-color: chartreuse;
+}
+
+.video-grid {
+  display: grid;
+  grid-template-rows: 50% 50%;
+  grid-template-columns: 50% 50%;
+}
+
+.video {
+  width: 50vw;
+  height: calc(50vh - 40px);
+  cursor: pointer;
+  background-color: wheat;
+  transition: all 0.5s linear;
+}
+
+.full-video {
+  position: absolute;
+  width: 100vw;
+  height: calc(100vh - 80px);
+  z-index: 1;
+}
