@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Test streams</title>
+    <link rel="stylesheet" href="../index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="../initVideo.js"></script>
+    <style>
+      .video {
+        border: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <a href="/">Видеонаблюдение</a>
+      <a href="/static/filter">Фильтры для видео</a>
+      <a href="/static/sound">Анализатор звука</a>
+      <a href="/static/detector">Детектор движения</a>
+    </nav>
+
+    <div class="video-grid">
+      <div class="video-container"><video id="video-1" controls class="video" muted></video></div>
+      <div>
+        <label for="brightness"
+          >Яркость<input type="range" id="brightness" min="0" value="1" max="2" step="0.1" />
+          <span id="brightness-value">1</span>
+        </label>
+        <label for="contrast"
+          >Контрастность<input
+            type="range"
+            id="contrast"
+            min="0"
+            value="1"
+            max="2"
+            step="0.1"
+          /><span id="contrast-value">1</span></label
+        >
+      </div>
+    </div>
+
+    <script>
+      const video = document.getElementById('video-1');
+      const contrastValue = document.getElementById('contrast-value');
+      const brightnessValue = document.getElementById('brightness-value');
+
+      initVideo(
+        video,
+        'http://localhost:9191/master?url=http%3A%2F%2Flocalhost%3A3102%2Fstreams%2Fsosed%2Fmaster.m3u8',
+      );
+
+      let constrast = 1;
+      let brightness = 1;
+
+      function handleChangeInput(e) {
+        if (e.target.id === 'brightness') {
+          brightness = e.target.value;
+        }
+
+        if (e.target.id === 'contrast') {
+          constrast = e.target.value;
+        }
+
+        video.style.filter = `brightness(${brightness}) contrast(${constrast})`;
+        brightnessValue.innerText = brightness;
+        contrastValue.innerText = constrast;
+      }
+
+      document.querySelector('#brightness').addEventListener('input', handleChangeInput);
+      document.querySelector('#contrast').addEventListener('input', handleChangeInput);
+    </script>
+  </body>
+</html>
