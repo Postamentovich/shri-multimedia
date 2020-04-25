@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Анализатор звука</title>
+    <link rel="stylesheet" href="../index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="../initVideo.js"></script>
+    <style>
+      .video {
+        border: none;
+      }
+      .canvas-container {
+        display: flex;
+        justify-content: center;
+      }
+      #oscilloscope {
+        border: 1px solid var(--main-color);
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <a href="/">Видеонаблюдение</a>
+      <a href="/static/filter">Фильтры для видео</a>
+      <a href="/static/sound">Анализатор звука</a>
+      <a href="/static/detector">Детектор движения</a>
+    </nav>
+
+    <div class="video-grid">
+      <div class="video-container"><video id="video-1" controls class="video" muted></video></div>
+      <div class="canvas-container"><canvas id="oscilloscope"></canvas></div>
+    </div>
+
+    <script>
+      const video = document.getElementById('video-1');
+
+      initVideo(
+        video,
+        'http://localhost:9191/live?url=http%3A%2F%2Flocalhost%3A3102%2Fstreams%2Fstairs%2Fmaster.m3u8',
+      );
+
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioCtx.createMediaElementSource(video);
+      const analyser = audioCtx.createAnalyser();
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+      analyser.fftSize = 32;
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      analyser.getByteTimeDomainData(dataArray);
+      const canvas = document.getElementById('oscilloscope');
+      const canvasWidth = 100;
+      const canvasHeight = 500;
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+      const canvasCtx = canvas.getContext('2d');
+      const maxValue = 230;
+
+      function getMaxOfArray(numArray) {
+        return Math.max.apply(null, numArray);
+      }
+
+      function draw() {
+        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+        analyser.getByteTimeDomainData(dataArray);
+        const value = getMaxOfArray(dataArray);
+        canvasCtx.fillStyle = 'rgb(75, 183, 141)';
+        const barHeight = (canvasHeight * value) / maxValue;
+        const offsetY = canvasHeight - barHeight;
+        canvasCtx.fillRect(0, offsetY, canvasWidth, barHeight);
+        requestAnimationFrame(draw);
+      }
+
+      draw();
+    </script>
+  </body>
+</html>
